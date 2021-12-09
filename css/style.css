@@ -182,7 +182,8 @@ body.locked {
   display: flex;
   justify-content: space-between;
   width: 65%;
-  margin-right: auto;
+  margin: 0 auto 0 0;
+  padding: 0;
   list-style: none;
 }
 
@@ -300,8 +301,10 @@ body.locked {
 }
 
 .header-lower__dropdown-list {
+  padding: 0;
   height: 220px;
   padding-right: 19px;
+  list-style: none;
 }
 
 .header-lower__dropdown-item:not(:last-child) {
@@ -839,13 +842,14 @@ body.locked {
 
 .catalog__title {
   display: inline-block;
-  margin-right: 39px;
+  margin: 0 39px 0 0;
   color: #333;
 }
 
 .catalog__languages-list {
   display: flex;
   align-items: center;
+  padding: 0;
   list-style: none;
 }
 
@@ -1137,6 +1141,7 @@ body.locked {
   border: none;
   border-top: 1px solid #CACACA;
   border-radius: 0;
+  margin: 0;
   padding: 31px 0;
   background: transparent;
   transition: all .2s ease;
@@ -1150,7 +1155,7 @@ body.locked {
   content: '';
   position: absolute;
   z-index: 1;
-  bottom: -3px;
+  bottom: -1px;
   width: 100%;
   height: 1px;
   background-color: #7943A4;
@@ -2599,7 +2604,7 @@ body.locked {
 
   /* CATALOG */
   .catalog__title {
-    margin-right: 42px;
+    margin: 0 42px 0 0;
   }
 
   .catalog__languages-list {
@@ -2900,7 +2905,7 @@ body.locked {
   }
 
   .catalog__title {
-    margin-right: 40px;
+    margin: 0 40px 0 0;
   }
 
   .catalog__languages-list {
