@@ -105,6 +105,34 @@ const gallerySwiper = new Swiper('.gallery__column-right', {
   },
 });
 
+// Modal window
+const gallerySlidesContainer = document.querySelector('.gallery__slides');
+const modal = document.querySelector('.gallery__modal');
+const modalImg = document.querySelector('.gallery__modal-img');
+const btnCloseModal = document.querySelector('.gallery__modal-close');
+const overlay = document.querySelector('.overlay');
+
+// Open modal window
+gallerySlidesContainer.addEventListener('click', (e) => {
+  const clicked = e.target.closest('.gallery__slide');
+  if (!clicked) return;
+
+  modalImg.src = clicked.querySelector('.gallery__img').src;
+
+  modal.classList.add('active');
+  overlay.classList.add('active');
+  document.body.classList.add('locked');
+});
+
+// Close modal window
+[btnCloseModal, overlay].forEach(item => {
+  item.addEventListener('click', () => {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.classList.remove('locked');
+  });
+});
+
 // CATALOG
 // Language tabs
 const languagesContainer = document.querySelector('.catalog__languages-list');
