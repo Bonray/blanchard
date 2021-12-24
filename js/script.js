@@ -1,4 +1,41 @@
 // HEADER
+// Navigation on mobile devices
+const headerBurger = document.querySelector('.header-upper__burger');
+
+headerBurger.addEventListener('click', () => {
+  nav.classList.toggle('active');
+  headerBurger.classList.toggle('active');
+  document.body.classList.toggle('locked');
+});
+
+// Open/close the search field on mobile devices
+const searchFormMobile = document.querySelector('.header-upper__input-group');
+const searchMobileBtn = document.querySelector('.header-upper__search-btn-mobile');
+const searchInput = document.querySelector('.header-upper__input');
+const btnCloseSearchFormMobile = document.querySelector('.header-upper__search-btn-close-mobile');
+
+searchMobileBtn.addEventListener('click', () => {
+  searchFormMobile.classList.add('active');
+  searchInput.classList.add('active');
+  btnCloseSearchFormMobile.classList.add('active');
+});
+
+btnCloseSearchFormMobile.addEventListener('click', () => {
+  searchFormMobile.classList.remove('active');
+  searchInput.classList.remove('active');
+  btnCloseSearchFormMobile.classList.remove('active');
+});
+
+// Close the search form by clicking anywhere in the document
+document.addEventListener('click', (e) => {
+  const clicked = e.target;
+  if (clicked !== searchMobileBtn && clicked !== searchInput) {
+    searchFormMobile.classList.remove('active');
+    searchInput.classList.remove('active');
+    btnCloseSearchFormMobile.classList.remove('active');
+  }
+});
+
 // Show/hide dropdowns lists
 const dropdownContainer = document.querySelector('.header-lower__list');
 const dropdownsCollection = document.querySelectorAll('.header-lower__dropdown');
@@ -58,7 +95,7 @@ const choices = new Choices(element, {
 });
 
 // Swiper
-const gallerySwiper = new Swiper('.gallery__column-right', {
+const gallerySwiper = new Swiper('.gallery__swiper-container', {
   // Optional parameters
   breakpoints: {
     290: {
@@ -137,12 +174,29 @@ gallerySlidesContainer.addEventListener('click', (e) => {
 // Language tabs
 const languagesContainer = document.querySelector('.catalog__languages-list');
 const languagesTabs = document.querySelectorAll('.catalog__languages-btn');
+
+const hideCatalogText = function() {
+  if (window.innerWidth <= 767) document.querySelector('.catalog__text-container').classList.remove('active');
+  if (window.innerWidth > 767) document.querySelector('.catalog__text-container').classList.add('active');
+}
+hideCatalogText();
+
 languagesContainer.addEventListener('click', (e) => {
   const clicked = e.target.closest('.catalog__languages-btn');
   if (!clicked) return;
 
   languagesTabs.forEach(tab => tab.classList.remove('catalog__languages-btn--active'));
   clicked.classList.add('catalog__languages-btn--active');
+
+  // Change the language of the content
+  const changeContentLanguage = function(el) {
+    document.querySelectorAll(el).forEach(text => text.classList.remove('active'));
+    document.querySelector(`${el}--${clicked.dataset.language}`).classList.add('active');
+  }
+  if (window.innerWidth > 767) changeContentLanguage('.catalog__text');
+  changeContentLanguage('.catalog__artist-name');
+  changeContentLanguage('.catalog__artist-birthday');
+  changeContentLanguage('.catalog__artist-desc');
 });
 
 // Accordion
@@ -161,18 +215,24 @@ paintersContainer.addEventListener('click', (e) => {
   const clicked = e.target.closest('.catalog__painters-tab');
   if (!clicked) return;
 
+  // Assigning the active class to the tabs
   paintersTabs.forEach(tab => tab.classList.remove('catalog__painters-tab--active'));
   paintersTabsContent.forEach(content => content.classList.remove('catalog__artist--active'));
   clicked.classList.add('catalog__painters-tab--active');
   document.querySelector(`.catalog__artist--${clicked.dataset.tab}`).classList.add('catalog__artist--active');
+
+  // Scroll to the painter description on mobile devices
+  if (window.innerWidth <= 963) {
+    document.querySelector('.catalog__artist--active').scrollIntoView({behavior: 'smooth'}); 
+  }
 });
 
-// "Go to the gallery" links
+// Scroll to the gallery section
 const goToGalleryBtnCollection = document.querySelectorAll('.catalog__no-content-link, .catalog__artist-link');
 goToGalleryBtnCollection.forEach(link => {
   const id = link.getAttribute('href');
   document.querySelector(id).scrollIntoView({behavior: 'smooth'});
-})
+});
 
 // EVENTS
 // "Show all items" button
@@ -225,7 +285,7 @@ const checkboxList = document.querySelectorAll('.editions__categories-input');
 const removeBtnsCollection = document.querySelectorAll('.editions__categories-btn-remove');
 
 // Display the full list of categories
-const renderList = function() {
+const renderFullList = function() {
   editionsList.forEach(item => item.classList.add('active'));
 }
 
@@ -237,11 +297,38 @@ const renderCheckedList = function() {
   });
 }
 
+const initCategoriesList = function() {
+  if (window.innerWidth <= 767) renderCheckedList();
+  else renderFullList();
+}
+initCategoriesList();
+
+const toggleRemoveBtnActiveClass = function(btn) {
+  if (btn.querySelector('.editions__categories-input').checked) {
+    btn.querySelector('.editions__categories-btn-remove').classList.add('active');
+  }
+  else {
+    btn.querySelector('.editions__categories-btn-remove').classList.remove('active');
+  }
+}
+
+// Hide or show the 'remove item' button depending on the width of the window
+const hideCategoriesRemoveBtn = function() {
+  removeBtnsCollection.forEach(btn => {
+    if (window.innerWidth > 767) btn.classList.remove('active');
+    if (window.innerWidth <= 767) {
+      const editionsItem = btn.closest('.editions__categories-item');
+      toggleRemoveBtnActiveClass(editionsItem);
+    }
+  });
+}
+hideCategoriesRemoveBtn();
+
 // Show/hide the categories list
 listTitle.addEventListener('click', () => {
   if (window.innerWidth <= 767) {
     listTitle.classList.toggle('active');
-    if (listTitle.classList.contains('active')) renderList();
+    if (listTitle.classList.contains('active')) renderFullList();
     else renderCheckedList();
   }
 });
@@ -263,19 +350,17 @@ removeBtnsCollection.forEach(btn => {
   });
 });
 
-// Toggle the active class of items remove button
+// Toggle the active class of items' remove button
 editionsListContainer.addEventListener('click', (e) => {
   if (window.innerWidth <= 767) {
     const clickedEditionsItem = e.target.closest('.editions__categories-item');
-    if (!clickedEditionsItem) return;
-    
-    if (clickedEditionsItem.querySelector('.editions__categories-input').checked) clickedEditionsItem.querySelector('.editions__categories-btn-remove').classList.add('active');
-    else clickedEditionsItem.querySelector('.editions__categories-btn-remove').classList.remove('active');
+    if (!clickedEditionsItem) return;    
+    toggleRemoveBtnActiveClass(clickedEditionsItem);
   }
 });
 
 // Swiper
-const editionsSwiperEl = document.querySelector('.editions__col-right')
+const editionsSwiperEl = document.querySelector('.editions__swiper-container')
 let editionsSwiper;
 const initEditionsSwiper = function() {
   if (window.innerWidth <= 767 && editionsSwiperEl.dataset.mobile === 'true') {
@@ -414,8 +499,8 @@ function init(){
 }
 
 // Input mask
-var selector = document.querySelector("input[type='tel']");
-var im = new Inputmask("+7 (999) 999-99-99");
+const selector = document.querySelector("input[type='tel']");
+const im = new Inputmask("+7 (999) 999-99-99");
 im.mask(selector);
 new JustValidate('.contacts__form', {
   rules: {
@@ -437,46 +522,23 @@ new JustValidate('.contacts__form', {
     tel: 'Недопустимый формат'
   },
   colorWrong: '#D11616',
-});
-
-// Navigation on mobile devices
-const headerBurger = document.querySelector('.header-upper__burger');
-
-headerBurger.addEventListener('click', () => {
-  nav.classList.toggle('active');
-  headerBurger.classList.toggle('active');
-  document.body.classList.toggle('locked');
-});
-
-// Open/close the search field on mobile devices
-const searchFormMobile = document.querySelector('.header-upper__input-group');
-const searchMobileBtn = document.querySelector('.header-upper__search-btn-mobile');
-const searchInput = document.querySelector('.header-upper__input');
-const btnCloseSearchFormMobile = document.querySelector('.header-upper__search-btn-close-mobile');
-
-searchMobileBtn.addEventListener('click', () => {
-  searchFormMobile.classList.add('active');
-  searchInput.classList.add('active');
-  btnCloseSearchFormMobile.classList.add('active');
-});
-
-btnCloseSearchFormMobile.addEventListener('click', () => {
-  searchFormMobile.classList.remove('active');
-  searchInput.classList.remove('active');
-  btnCloseSearchFormMobile.classList.remove('active');
-});
-
-// Close the search form by clicking anywhere in the document
-document.addEventListener('click', (e) => {
-  const clicked = e.target;
-  if (clicked !== searchMobileBtn && clicked !== searchInput) {
-    searchFormMobile.classList.remove('active');
-    searchInput.classList.remove('active');
-    btnCloseSearchFormMobile.classList.remove('active');
+  submitHandler: function(form, values, ajax) {
+    ajax({
+      url: '../php/mail.php',
+      method: 'POST',
+      data: values,
+      async: true,
+      callback: function(response) {
+        document.querySelector('.contacts__form-message-success').style.display = 'inline-block';
+      }
+    })
   }
 });
 
 window.addEventListener('resize', () => {
   initEventsSwiper();
   initEditionsSwiper();
+  initCategoriesList();
+  hideCategoriesRemoveBtn();
+  hideCatalogText();
 });
