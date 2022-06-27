@@ -4,7 +4,7 @@ Demo: https://blanchard-art.netlify.app/
 
 Лендинг с адаптивом для арт-галереи на HTML и CSS с применением следующих плагинов:
 - Choices.js (для выпадающих списков)
-- Tiipy.js (для тултипов)
+- Tippy.js (для тултипов)
 - jQuery Accordion (аккордион)
 - API Яндекс.карт
 - Swiper (для слайдеров)
